@@ -29,7 +29,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        Connect();
+        //Connect();
     }
 
     #endregion
