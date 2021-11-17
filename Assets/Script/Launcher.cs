@@ -26,6 +26,8 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     string gameVersion = "1";
 
+    bool isConnecting;
+
     #endregion
 
     #region MonoBehaviour CallBacks
@@ -49,11 +51,16 @@ public class Launcher : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         Debug.Log("PUN Launcher: OnConnectedToMaster() was called by PUN");
-        PhotonNetwork.JoinRandomRoom();
+        if (isConnecting)
+        {
+            PhotonNetwork.JoinRandomRoom();
+            isConnecting = false;
+        }      
     }
 
     public override void OnDisconnected(DisconnectCause cause)
     {
+        isConnecting = false;
         progressLabel.SetActive(false);
         controlPanel.SetActive(true);
         Debug.LogWarningFormat("PUN Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
@@ -68,6 +75,11 @@ public class Launcher : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         Debug.Log("PUN Launcher: OnJoinedRoom() called by PUN. Now this client is in a room.");
+        if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
+        {
+            Debug.Log("We load the 'Room for 1' ");
+            PhotonNetwork.LoadLevel("Room for 1");
+        }
     }
 
     #endregion
@@ -84,7 +96,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         }
         else
         {
-            PhotonNetwork.ConnectUsingSettings();
+            isConnecting = PhotonNetwork.ConnectUsingSettings();
             PhotonNetwork.GameVersion = gameVersion;
         }
     }
